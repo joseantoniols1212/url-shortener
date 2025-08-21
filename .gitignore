@@ -1,0 +1,41 @@
+# Node modules
+node_modules/
+
+# Build outputs
+dist/
+build/
+.next/
+out/
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local env files
+.env*
+!.env.example
+
+# AWS Serverless
+.serverless/
+.aws-sam/
+cdk.out/
+
+# IDEs and system
+.vscode/
+.DS_Store
+Thumbs.db
+*.swp
+
+# Coverage
+coverage/
+
+# Misc
+.parcel-cache/
+.eslintcache
+
+# Blocked dependencies
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
