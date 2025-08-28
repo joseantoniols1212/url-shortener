@@ -1,0 +1,32 @@
+<div class="overflow-x-auto">
+    <table class="table">
+    <!-- head -->
+    <thead>
+        <tr>
+        <th>#</th>
+        <th>Original URL</th>
+        <th>Shortened code</th>
+        <th>Shortened URL</th>
+        <th>Visits</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr class="hover:bg-base-300">
+        <td>1</td>
+        <td>test</td>
+        <td>test</td>
+        <td>test</td>
+        <td>test</td>
+        </tr>
+        @for(url of urls(); track url.code; let idx = $index) {
+            <tr class="hover:bg-base-300">
+            <td>{{ idx + 1 }}</td>
+            <td>{{ url.originalUrl }}</td>
+            <td>{{ url.code }}</td>
+            <td>{{ "www.shortened.com/" + url.code }}</td>
+            <td>{{ url.visits }}</td>
+            </tr>
+        }
+    </tbody>
+    </table>
+</div>

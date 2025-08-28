@@ -1,0 +1,36 @@
+<div class="hero bg-base-200 min-h-screen">
+  <div class="hero-content flex-col lg:flex-row-reverse">
+    <div class="text-center lg:text-left">
+      <h1 class="text-5xl font-bold text-primary">Login now!</h1>
+      <p class="py-6">
+        Shorten your URL now! <a class="link link-hover underline text-primary">Create an account</a> or log in to start
+      </p>
+    </div>
+    <div class="card bg-base-100 w-full max-w-sm shrink-0 shadow-2xl">
+      <div class="card-body">
+        <fieldset class="fieldset">
+          <label class="label">Email</label>
+          <input type="email" class="input" placeholder="Email" />
+          <label class="label">Password</label>
+          <input type="password" class="input" placeholder="Password" />
+          <div class="flex justify-between mt-2">
+            <a class="link link-hover">Forgot password?</a>
+          </div>
+          <button
+            class="btn btn-neutral mt-2 hover:btn-primary"
+            [routerLink]="['/dashboard/urls']"
+          >
+            Login
+          </button>
+          <div class="divider">OR</div>
+          <button 
+            class="btn btn-block hover:btn-primary hover:text-primary-content"
+            [routerLink]="['/dashboard/urls']"
+          >
+            Continue with Google
+          </button>
+        </fieldset>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,33 @@
+<div class="navbar bg-base-100 shadow-sm">
+  <div class="navbar-start">
+    <div class="dropdown">
+      <div tabindex="0" role="button" class="btn btn-ghost md:hidden">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"> <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h8m-8 6h16" /> </svg>
+      </div>
+      <ul
+        tabindex="0"
+        class="menu menu-sm dropdown-content bg-base-100 rounded-box z-1 mt-3 w-52 p-2 shadow">
+        @for(item of items; track item.url) {
+          <li><a [routerLink]="[item.url]" [routerLinkActive]="['bg-primary', 'text-primary-content']">{{ item.label }}</a></li>
+        }
+      </ul>
+    </div>
+    <a class="text-xl mx-3">ShortenURL</a>
+  </div>
+  <div class="navbar-center hidden md:flex">
+    <ul class="menu menu-horizontal px-1 gap-2">
+      @for(item of items; track item.url) {
+        <li><button [routerLink]="[item.url]" [routerLinkActive]="['bg-primary', 'text-primary-content']">{{ item.label }}</button></li>
+      }
+    </ul>
+  </div>
+  <div class="navbar-end gap-4 mx-3">
+    <button
+      class="btn btn-outline hover:bg-primary hover:text-primary-content"
+      routerLink="/login"
+    >
+      Logout
+    </button>
+    <app-theme-swap />
+  </div>
+</div>
