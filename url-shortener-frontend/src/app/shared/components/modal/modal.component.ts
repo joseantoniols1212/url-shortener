@@ -9,6 +9,7 @@ export class ModalComponent {
 
   id = input.required<string>();
   textModal = input.required<string>();
+  titleModal = input.required<string>();
 
   openModal() {
     const dialog = <HTMLDialogElement>document.getElementById(this.id());
