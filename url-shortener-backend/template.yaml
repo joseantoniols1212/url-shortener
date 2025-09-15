@@ -10,57 +10,79 @@ Globals:
 
 
 Resources:
-  UrlTable:
-    Type: AWS::DynamoDB::Table
+  ApiGatewayApi:
+    Type: AWS::Serverless::Api
     Properties:
-      TableName: UrlTable
-      AttributeDefinitions:
-        - AttributeName: shortCode
-          AttributeType: S
-      KeySchema:
-        - AttributeName: shortCode
-          KeyType: HASH
-      BillingMode: PAY_PER_REQUEST
+      StageName: prod
+      Auth:
+        AddDefaultAuthorizerToCorsPreflight: false
+        Authorizers:
+          UrlAuth:
+            FunctionArn: !GetAtt AuthorizerFunction.Arn
+            FunctionPayloadType: TOKEN
+            Identity:
+              Header: Authorization
+              ReauthorizeEvery: 300
 
-  GetUrlFunction:
+  # UrlTable:
+  #   Type: AWS::DynamoDB::Table
+  #   Properties:
+  #     TableName: UrlTable
+  #     AttributeDefinitions:
+  #       - AttributeName: shortCode
+  #         AttributeType: S
+  #     KeySchema:
+  #       - AttributeName: shortCode
+  #         KeyType: HASH
+  #     BillingMode: PAY_PER_REQUEST
+  
+  AuthorizerFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/getUrl
+      CodeUri: src/auth/authorizer
       Handler: app.handler
-      Description: Recover the original URL from a short code
+      Description: JWT validator for protected routes
       Environment:
         Variables:
-          TABLE_NAME: !Ref UrlTable
+          USER_TABLE_NAME: !Ref UserTable
       Policies:
         - DynamoDBReadPolicy:
-            TableName: !Ref UrlTable
-      Events:
-        GetUrl:
-          Type: Api
-          Properties:
-            Path: /{shortCode}
-            Method: get
+            TableName: !Ref UserTable
 
-  CreateUrlFunction:
+  LoginFunction:
     Type: AWS::Serverless::Function
     Properties:
-      CodeUri: src/createUrl
+      CodeUri: src/auth/login
       Handler: app.handler
-      Description: Crear un nuevo short code para una URL
+      Description: Login user
       Environment:
         Variables:
-          TABLE_NAME: !Ref UrlTable
+          USER_TABLE_NAME: !Ref UserTable
       Policies:
-        - DynamoDBCrudPolicy:
-            TableName: !Ref UrlTable
+        - DynamoDBReadPolicy:
+            TableName: !Ref UserTable
       Events:
-        CreateUrl:
+        ApiEvent:
           Type: Api
           Properties:
-            Path: /
             Method: post
+            Path: /auth/login
+            RestApiId: 
+              Ref: ApiGatewayApi
+
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: UserTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
 
 Outputs:
   ApiUrl:
     Description: "URL base del API Gateway"
-    Value: !Sub "https://${ServerlessRestApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
+    Value: !Sub "https://${ApiGatewayApi}.execute-api.${AWS::Region}.amazonaws.com/Prod/"
