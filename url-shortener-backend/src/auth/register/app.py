@@ -58,7 +58,7 @@ def handler(event, _context):
     ## Write in dynamoDB
     table.put_item(Item=user)
 
-    token = jwt.encode({"User": {"id": userId}}, JWT_SECRET, algorithm='HS256')
+    token = jwt.encode({"sub": {"id": userId, "roles": []}}, JWT_SECRET, algorithm='HS256')
 
     return {
         "statusCode": 200,

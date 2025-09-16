@@ -27,7 +27,7 @@ Resources:
             FunctionPayloadType: TOKEN
             Identity:
               Header: Authorization
-              ReauthorizeEvery: 300
+              ReauthorizeEvery: 0
 
   UrlTable:
     Type: AWS::DynamoDB::Table
@@ -95,8 +95,7 @@ Resources:
           Properties:
             Method: POST
             Path: /auth/login
-            RestApiId: 
-              Ref: ApiGatewayApi
+            RestApiId: !Ref ApiGatewayApi
 
   RegisterFunction:
     Type: AWS::Serverless::Function
@@ -117,10 +116,32 @@ Resources:
           Properties:
             Method: POST
             Path: /auth/register
-            RestApiId: 
-              Ref: ApiGatewayApi
+            RestApiId: !Ref ApiGatewayApi
 
-
+  CreateShortCodeFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/crud/createShortCode
+      Handler: app.handler
+      Description: Creates the short code entry in the database
+      Environment:
+        Variables:
+          URL_TABLE_NAME: !Ref UrlTable
+          USER_TABLE_NAME: !Ref UserTable
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UrlTable
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /url
+            RestApiId: !Ref ApiGatewayApi
+            Auth:
+              Authorizer: UrlAuth
 Outputs:
   ApiUrl:
     Description: "URL base del API Gateway"

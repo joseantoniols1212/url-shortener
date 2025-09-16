@@ -1,28 +1,40 @@
 import json
+import jwt
+import os
 
+JWT_SECRET = os.environ["JWT_SECRET"]
 
 def handler(event, context):
-    token = event['authorizationToken']
-    if token == 'allow':
-        print('authorized')
-        response = generatePolicy('user', 'Allow', event['methodArn'])
-    elif token == 'deny':
-        print('unauthorized')
-        response = generatePolicy('user', 'Deny', event['methodArn'])
-    elif token == 'unauthorized':
-        print('unauthorized')
-        raise Exception('Unauthorized')  # Return a 401 Unauthorized response
-        return 'unauthorized'
+    token_input = event['authorizationToken']
+
+    if not token_input.startswith("Bearer "):
+        raise Exception('Unauthorized')
+
+    token = token_input[7:]
+
+    decoded_token = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+
+    user = decoded_token.get("user", {})
+    user_id = user.get("id", "")
+
+    if not user_id or user_id == "":
+        raise Exception('Unauthorized')
+    
+    #TODO: Check methodArn and roles and deny if not enough permission
+    
+    response = generatePolicy(user_id, [], 'Allow', event['methodArn'])
+
     try:
+        print("a")
         return json.loads(response)
-    except BaseException:
-        print('unauthorized')
-        return 'unauthorized'  # Return a 500 error
+    except Exception as e:
+        print('Exception ', str(e))
+        raise Exception('Unauthorized')
 
 
-def generatePolicy(principalId, effect, resource):
+def generatePolicy(id, roles, effect, resource):
     authResponse = {}
-    authResponse['principalId'] = principalId
+    authResponse['principalId'] = id
     if (effect and resource):
         policyDocument = {}
         policyDocument['Version'] = '2012-10-17'
@@ -34,9 +46,7 @@ def generatePolicy(principalId, effect, resource):
         policyDocument['Statement'] = [statementOne]
         authResponse['policyDocument'] = policyDocument
     authResponse['context'] = {
-        "stringKey": "stringval",
-        "numberKey": 123,
-        "booleanKey": True
+        "id": id
     }
     authResponse_JSON = json.dumps(authResponse)
     return authResponse_JSON

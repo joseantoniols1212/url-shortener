@@ -61,7 +61,9 @@ def handler(event, _context):
     #TODO: extract roles of user
     roles = []
 
-    token = jwt.encode({'id': user.get('id'), 'roles': roles }, JWT_SECRET, algorithm='HS256')
+    user_id = user.get("id")
+
+    token = jwt.encode({"sub": user_id, "user": {"id": user_id, "roles": roles}}, JWT_SECRET, algorithm='HS256')
 
     body = json.dumps({ 
         "token": token
