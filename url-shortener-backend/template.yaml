@@ -4,10 +4,15 @@ Description: URL Shortener Backend
 
 Globals:
   Function:
-    Timeout: 3
+    Timeout: 60
     Runtime: python3.13
     MemorySize: 128
 
+Parameters:
+  JwtSecret:
+    Type: String
+    Description: JWT secret
+    Default: secret
 
 Resources:
   ApiGatewayApi:
@@ -24,18 +29,39 @@ Resources:
               Header: Authorization
               ReauthorizeEvery: 300
 
-  # UrlTable:
-  #   Type: AWS::DynamoDB::Table
-  #   Properties:
-  #     TableName: UrlTable
-  #     AttributeDefinitions:
-  #       - AttributeName: shortCode
-  #         AttributeType: S
-  #     KeySchema:
-  #       - AttributeName: shortCode
-  #         KeyType: HASH
-  #     BillingMode: PAY_PER_REQUEST
+  UrlTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: UrlTable
+      AttributeDefinitions:
+        - AttributeName: shortCode
+          AttributeType: S
+      KeySchema:
+        - AttributeName: shortCode
+          KeyType: HASH
+      BillingMode: PAY_PER_REQUEST
   
+  UserTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: UserTable
+      AttributeDefinitions:
+        - AttributeName: id
+          AttributeType: S
+        - AttributeName: email
+          AttributeType: S
+      KeySchema:
+        - AttributeName: id
+          KeyType: HASH
+      GlobalSecondaryIndexes:
+        - IndexName: EmailIndex
+          KeySchema:
+            - AttributeName: email
+              KeyType: HASH
+          Projection:
+            ProjectionType: ALL
+      BillingMode: PAY_PER_REQUEST
+
   AuthorizerFunction:
     Type: AWS::Serverless::Function
     Properties:
@@ -45,6 +71,7 @@ Resources:
       Environment:
         Variables:
           USER_TABLE_NAME: !Ref UserTable
+          JWT_SECRET: !Ref JwtSecret
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref UserTable
@@ -58,6 +85,7 @@ Resources:
       Environment:
         Variables:
           USER_TABLE_NAME: !Ref UserTable
+          JWT_SECRET: !Ref JwtSecret
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref UserTable
@@ -65,22 +93,33 @@ Resources:
         ApiEvent:
           Type: Api
           Properties:
-            Method: post
+            Method: POST
             Path: /auth/login
             RestApiId: 
               Ref: ApiGatewayApi
 
-  UserTable:
-    Type: AWS::DynamoDB::Table
+  RegisterFunction:
+    Type: AWS::Serverless::Function
     Properties:
-      TableName: UserTable
-      AttributeDefinitions:
-        - AttributeName: id
-          AttributeType: S
-      KeySchema:
-        - AttributeName: id
-          KeyType: HASH
-      BillingMode: PAY_PER_REQUEST
+      CodeUri: src/auth/register
+      Handler: app.handler
+      Description: Register user
+      Environment:
+        Variables:
+          USER_TABLE_NAME: !Ref UserTable
+          JWT_SECRET: !Ref JwtSecret
+      Policies:
+        - DynamoDBCrudPolicy:
+            TableName: !Ref UserTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: POST
+            Path: /auth/register
+            RestApiId: 
+              Ref: ApiGatewayApi
+
 
 Outputs:
   ApiUrl:
