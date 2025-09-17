@@ -1,13 +1,12 @@
 import json
 from json import JSONDecodeError
-
 import boto3
 import os
-import jwt
-
 import bcrypt
-
 from uuid import uuid4
+
+from common.jwt_utils import create_jwt
+
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["USER_TABLE_NAME"])
@@ -47,10 +46,10 @@ def handler(event, _context):
     passwordBytes = password.encode('utf-8')
     passwordHash = bcrypt.hashpw(passwordBytes, salt)
 
-    userId = str(uuid4())
+    user_id = str(uuid4())
 
     user = {
-        "id": userId,
+        "id": user_id,
         "email": email,
         "passwordHash": passwordHash.decode('utf-8')
     }
@@ -58,7 +57,8 @@ def handler(event, _context):
     ## Write in dynamoDB
     table.put_item(Item=user)
 
-    token = jwt.encode({"sub": {"id": userId, "roles": []}}, JWT_SECRET, algorithm='HS256')
+    roles = []
+    token = create_jwt(user_id, roles)
 
     return {
         "statusCode": 200,

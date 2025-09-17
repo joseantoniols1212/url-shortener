@@ -4,8 +4,9 @@ from boto3.dynamodb.conditions import Key
 import os
 import jwt
 import hashlib
-
 import bcrypt
+
+from common.jwt_utils import create_jwt
 
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["USER_TABLE_NAME"])
@@ -63,7 +64,7 @@ def handler(event, _context):
 
     user_id = user.get("id")
 
-    token = jwt.encode({"sub": user_id, "user": {"id": user_id, "roles": roles}}, JWT_SECRET, algorithm='HS256')
+    token = create_jwt(user_id, roles)
 
     body = json.dumps({ 
         "token": token

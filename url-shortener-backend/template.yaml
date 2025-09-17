@@ -29,6 +29,16 @@ Resources:
               Header: Authorization
               ReauthorizeEvery: 0
 
+  CommonLayer:
+    Type: AWS::Serverless::LayerVersion
+    Properties:
+      LayerName: common-layer
+      Description: Common utilities
+      ContentUri: layers/common
+      CompatibleRuntimes:
+        - python3.13
+      RetentionPolicy: Retain
+
   UrlTable:
     Type: AWS::DynamoDB::Table
     Properties:
@@ -82,6 +92,8 @@ Resources:
       CodeUri: src/auth/login
       Handler: app.handler
       Description: Login user
+      Layers:
+        - !Ref CommonLayer
       Environment:
         Variables:
           USER_TABLE_NAME: !Ref UserTable
@@ -103,6 +115,8 @@ Resources:
       CodeUri: src/auth/register
       Handler: app.handler
       Description: Register user
+      Layers:
+        - !Ref CommonLayer
       Environment:
         Variables:
           USER_TABLE_NAME: !Ref UserTable
