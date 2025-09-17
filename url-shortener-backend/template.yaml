@@ -181,6 +181,26 @@ Resources:
             Auth:
               Authorizer: UrlAuth
 
+  GetUserUrlsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/crud/redirect
+      Handler: app.handler
+      Description: Redirect to the original url of the shortcode
+      Environment:
+        Variables:
+          USER_TABLE_NAME: !Ref UrlTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UrlTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /{shortCode}
+            RestApiId: !Ref ApiGatewayApi
+
 Outputs:
   ApiUrl:
     Description: "URL base del API Gateway"
