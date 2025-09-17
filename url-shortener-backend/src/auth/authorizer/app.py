@@ -2,7 +2,7 @@ import json
 import jwt
 import os
 
-JWT_SECRET = os.environ["JWT_SECRET"]
+from common.jwt_utils import get_claims_jwt
 
 def handler(event, context):
     token_input = event['authorizationToken']
@@ -12,12 +12,16 @@ def handler(event, context):
 
     token = token_input[7:]
 
-    decoded_token = jwt.decode(token, JWT_SECRET, algorithms=["HS256"])
+    try:
+        claims = get_claims_jwt(token)
+    except jwt.ExpiredSignatureError:
+        raise Exception('Unauthorized')
+    except jwt.InvalidTokenError:  # General exception of jwt decode
+        raise Exception('Unauthorized')
 
-    user = decoded_token.get("user", {})
-    user_id = user.get("id", "")
+    user_id = claims.get("sub", None)
 
-    if not user_id or user_id == "":
+    if not user_id:
         raise Exception('Unauthorized')
     
     #TODO: Check methodArn and roles and deny if not enough permission
@@ -25,7 +29,6 @@ def handler(event, context):
     response = generatePolicy(user_id, [], 'Allow', event['methodArn'])
 
     try:
-        print("a")
         return json.loads(response)
     except Exception as e:
         print('Exception ', str(e))

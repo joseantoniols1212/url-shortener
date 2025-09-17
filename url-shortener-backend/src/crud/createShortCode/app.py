@@ -19,8 +19,6 @@ def create_short_code(original_url):
 
 def handler(event, context):
 
-    print("b")
-
     body = json.loads(event["body"])
     original_url = body["url"]
 
