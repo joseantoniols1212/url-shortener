@@ -30,23 +30,28 @@ def handler(event, context):
 
     auth_context = event["requestContext"]["authorizer"]
 
-    # user_table.update_item(
-    #     Key={"id": ""},
-    #     UpdateExpression="SET #settings.#lang = :lang",
-    #     ExpressionAttributeNames={
-    #         "#settings": "settings",
-    #         "#lang": "language"
-    #     },
-    #     ExpressionAttributeValues={
-    #         ":lang": "en"
-    #     },
-    #     ReturnValues="UPDATED_NEW"
-    # )
+    user_id = auth_context.get("id", None)
 
+    if not user_id:
+        return {
+            "statusCode": 403,
+            "error": "Unauthorized"
+        }
+
+    user_table.update_item(
+        Key={"id": user_id },
+        UpdateExpression= "SET urls.#shortcode = :originalUrl",
+        ExpressionAttributeNames={
+            "#shortcode": short_code
+        },
+        ExpressionAttributeValues={
+            ":originalUrl": original_url
+        }
+    )
 
     return {
         "statusCode": 200,
         "body": json.dumps(
-            {"url": original_url, "shortenedUrl": f"https://short.url/{short_code}", "test": json.dumps(auth_context) }
+            {"url": original_url, "shortCode": short_code }
         ),
     }

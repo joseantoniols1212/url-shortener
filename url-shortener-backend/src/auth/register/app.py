@@ -51,7 +51,8 @@ def handler(event, _context):
     user = {
         "id": user_id,
         "email": email,
-        "passwordHash": passwordHash.decode('utf-8')
+        "passwordHash": passwordHash.decode('utf-8'),
+        "urls": {}
     }
 
     ## Write in dynamoDB
