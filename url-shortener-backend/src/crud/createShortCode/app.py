@@ -32,6 +32,7 @@ def handler(event, context):
 
     user_id = auth_context.get("id", None)
 
+    # This should never happen
     if not user_id:
         return {
             "statusCode": 403,

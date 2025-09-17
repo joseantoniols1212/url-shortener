@@ -158,6 +158,29 @@ Resources:
             RestApiId: !Ref ApiGatewayApi
             Auth:
               Authorizer: UrlAuth
+
+  GetUserUrlsFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: src/crud/getUserUrls
+      Handler: app.handler
+      Description: Retrieve all the urls info for the user
+      Environment:
+        Variables:
+          USER_TABLE_NAME: !Ref UserTable
+      Policies:
+        - DynamoDBReadPolicy:
+            TableName: !Ref UserTable
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Method: GET
+            Path: /url
+            RestApiId: !Ref ApiGatewayApi
+            Auth:
+              Authorizer: UrlAuth
+
 Outputs:
   ApiUrl:
     Description: "URL base del API Gateway"
