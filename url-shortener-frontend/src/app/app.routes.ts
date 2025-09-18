@@ -1,10 +1,13 @@
-import { DashboardPageComponent } from './urls/pages/dashboard-page/dashboard-page.component';
+import { IsAuthenticated } from './shared/interceptors/isAuthenticated.interceptor';
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
     {
         path: 'login',
-        loadComponent: () => import('./auth/pages/login-page/login-page.component').then(m => m.LoginPageComponent)
+        loadComponent: () => import('./auth/pages/login-page/login-page.component').then(m => m.LoginPageComponent),
+        canActivate: [
+            IsAuthenticated
+        ]
     },
     {
         path: 'register',
