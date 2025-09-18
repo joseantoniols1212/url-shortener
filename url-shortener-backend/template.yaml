@@ -7,6 +7,11 @@ Globals:
     Timeout: 60
     Runtime: python3.13
     MemorySize: 128
+  Api:
+    Cors:
+      AllowOrigin: "'http://localhost:4200'"
+      AllowHeaders: "'Content-Type,Authorization'"
+      AllowMethods: "'OPTIONS,GET,POST,PUT,DELETE'"
 
 Parameters:
   JwtSecret:
@@ -100,6 +105,7 @@ Resources:
         Variables:
           USER_TABLE_NAME: !Ref UserTable
           JWT_SECRET: !Ref JwtSecret
+          ALLOWED_ORIGIN: http://localhost:4200
       Policies:
         - DynamoDBReadPolicy:
             TableName: !Ref UserTable

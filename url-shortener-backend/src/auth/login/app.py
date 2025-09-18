@@ -13,6 +13,7 @@ table = dynamodb.Table(os.environ["USER_TABLE_NAME"])
 hash_object = hashlib.sha256()
 
 JWT_SECRET = os.environ["JWT_SECRET"]
+ALLOWED_ORIGIN = os.environ.get("ALLOWED_ORIGIN", "*")
 
 def response(status, body_dict):
     return {
@@ -72,5 +73,8 @@ def handler(event, _context):
 
     return {
         "statusCode": 200,
+        "headers": {
+            "Access-Control-Allow-Origin": ALLOWED_ORIGIN,
+        },
         "body": body
     }
