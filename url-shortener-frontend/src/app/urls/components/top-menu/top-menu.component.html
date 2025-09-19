@@ -24,6 +24,7 @@
   <div class="navbar-end gap-4 mx-3">
     <button
       class="btn btn-outline hover:bg-primary hover:text-primary-content"
+      (click)="this.authService.logout()"
       routerLink="/login"
     >
       Logout

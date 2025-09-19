@@ -1,11 +1,11 @@
-import { IsAuthenticated } from './shared/interceptors/isAuthenticated.interceptor';
+import { IsAuthenticated } from './shared/guards/isAuthenticated.guard';
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
     {
         path: 'login',
         loadComponent: () => import('./auth/pages/login-page/login-page.component').then(m => m.LoginPageComponent),
-        canActivate: [
+        canMatch: [
             IsAuthenticated
         ]
     },
@@ -28,6 +28,9 @@ export const routes: Routes = [
             {
                 path: 'statistics',
                 loadComponent: () => import('./urls/pages/statistics-page/statistics-page.component').then(m => m.StatisticsPageComponent),
+            },{
+                path: '**',
+                redirectTo: 'urls'
             }
         ]
     },

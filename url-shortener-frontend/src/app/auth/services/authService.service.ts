@@ -1,3 +1,4 @@
+import { IsAuthenticated } from './../../shared/guards/isAuthenticated.guard';
 import { HttpClient } from '@angular/common/http';
 import { computed, Injectable, signal, inject } from '@angular/core';
 import type { JWTPayload } from "jose";
@@ -32,9 +33,14 @@ export class AuthService {
         return token? this.decode(token) : null
     });
     userId = computed(() => this.claims()?.sub)
+    isAuthenticated = computed(() => !!this.storedToken())
+
+    logout() {
+        localStorage.removeItem("token");
+        this.storedToken.set(null);
+    }
 
     async login(email: string, password: string) {
-        console.log({email, password});
         await firstValueFrom(this.http.post<{ token: string }>(`${baseUrl}/auth/login`, {
             email,
             password

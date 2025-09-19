@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { AuthService } from './../../../auth/services/authService.service';
+import { Component, inject } from '@angular/core';
 import { ThemeSwapComponent } from "./theme-swap/theme-swap.component";
 import { RouterLinkActive, RouterLink } from "@angular/router";
 
@@ -22,4 +23,6 @@ export class TopMenuComponent {
       url: '/dashboard/statistics'
     }
   ];
+
+  authService = inject(AuthService);
 }

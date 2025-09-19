@@ -18,9 +18,13 @@
           </div>
           <button
             class="btn btn-neutral mt-2 hover:btn-primary"
-            (click)="this.authService.login(emailInput.value, passwordInput.value)"
+            (click)="this.onClick(emailInput.value, passwordInput.value)"
           >
-            Login
+            @if(this.isWaitingAuth()) {
+              <span class="loading loading-dots loading-xs"></span>
+            } @else {
+              Login
+            }
           </button>
           <div class="divider">OR</div>
           <button 
